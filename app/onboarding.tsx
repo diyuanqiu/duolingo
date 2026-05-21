@@ -1,6 +1,6 @@
 import { images } from "@/constants/images";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import {
   Image,
   Text,
@@ -40,6 +40,8 @@ function SpeechBubble({
 }
 
 export default function OnboardingScreen() {
+  const router = useRouter();
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -104,7 +106,7 @@ export default function OnboardingScreen() {
           <TouchableOpacity
             activeOpacity={0.85}
             className="bg-lingua-purple flex-row items-center justify-center rounded-2xl py-4"
-            onPress={() => {}}
+            onPress={() => router.push("/sign-up")}
           >
             <Text className="font-poppins-semibold text-base text-white">
               Get Started
