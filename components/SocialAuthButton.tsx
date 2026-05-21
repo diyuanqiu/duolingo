@@ -1,10 +1,12 @@
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 type SocialProvider = "google" | "facebook" | "apple";
 
 type SocialAuthButtonProps = {
   provider: SocialProvider;
+  onPress?: () => void;
+  disabled?: boolean;
 };
 
 const LABELS: Record<SocialProvider, string> = {
@@ -23,9 +25,21 @@ function SocialIcon({ provider }: { provider: SocialProvider }) {
   return <FontAwesome name="apple" size={22} color="#000000" />;
 }
 
-export function SocialAuthButton({ provider }: SocialAuthButtonProps) {
+export function SocialAuthButton({
+  provider,
+  onPress,
+  disabled = false,
+}: SocialAuthButtonProps) {
   return (
-    <View className="mb-3 flex-row items-center rounded-2xl border border-border bg-background px-4 py-3.5">
+    <Pressable
+      onPress={onPress}
+      disabled={disabled || !onPress}
+      className="mb-3 flex-row items-center rounded-2xl border border-border bg-background px-4 py-3.5"
+      style={({ pressed }) => [
+        disabled || !onPress ? { opacity: 0.5 } : undefined,
+        pressed && onPress && !disabled ? { opacity: 0.85 } : undefined,
+      ]}
+    >
       <View className="w-8 items-center">
         <SocialIcon provider={provider} />
       </View>
@@ -33,6 +47,6 @@ export function SocialAuthButton({ provider }: SocialAuthButtonProps) {
         {LABELS[provider]}
       </Text>
       <View className="w-8" />
-    </View>
+    </Pressable>
   );
 }

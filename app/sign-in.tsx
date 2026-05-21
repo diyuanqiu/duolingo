@@ -4,6 +4,12 @@ import { AuthGradientButton } from "@/components/AuthGradientButton";
 import { SocialAuthButton } from "@/components/SocialAuthButton";
 import { VerificationCodeModal } from "@/components/VerificationCodeModal";
 import { images } from "@/constants/images";
+import { useSocialAuth } from "@/hooks/useSocialAuth";
+import {
+  finalizeSignIn,
+  getClerkErrorMessage,
+} from "@/lib/auth";
+import { useSignIn } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
@@ -20,10 +26,81 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignInScreen() {
   const router = useRouter();
+  const { signIn, errors, fetchStatus } = useSignIn();
+  const {
+    socialLoading,
+    socialError,
+    handleGooglePress,
+    handleFacebookPress,
+    clearSocialError,
+  } = useSocialAuth();
+
   const [email, setEmail] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   const isEmailValid = email.trim().length > 0;
+  const isBusy = fetchStatus === "fetching" || verifying;
+  const displayError = formError ?? socialError;
+
+  const handleSendCode = async () => {
+    Keyboard.dismiss();
+    setFormError(null);
+    setModalError(null);
+    clearSocialError();
+
+    const { error } = await signIn.emailCode.sendCode({
+      emailAddress: email.trim(),
+    });
+
+    if (error) {
+      setFormError(
+        getClerkErrorMessage(error, errors?.fields, "identifier")
+      );
+      return;
+    }
+
+    setModalVisible(true);
+  };
+
+  const handleVerifyCode = async (code: string) => {
+    setVerifying(true);
+    setModalError(null);
+
+    const { error } = await signIn.emailCode.verifyCode({ code });
+
+    if (error) {
+      setModalError(getClerkErrorMessage(error, errors?.fields, "code"));
+      setVerifying(false);
+      return false;
+    }
+
+    const finalized = await finalizeSignIn(signIn, router);
+    setVerifying(false);
+
+    if (!finalized) {
+      setModalError("Sign-in could not be completed. Please try again.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleResendCode = async () => {
+    setModalError(null);
+
+    const { error } = await signIn.emailCode.sendCode({
+      emailAddress: email.trim(),
+    });
+
+    if (error) {
+      setModalError(
+        getClerkErrorMessage(error, errors?.fields, "identifier")
+      );
+    }
+  };
 
   return (
     <>
@@ -57,21 +134,30 @@ export default function SignInScreen() {
 
           <AuthEmailField value={email} onChangeText={setEmail} />
 
+          {displayError ? (
+            <Text className="body-sm mt-3 text-[#E84B3B]">{displayError}</Text>
+          ) : null}
+
           <View className="mt-4">
             <AuthGradientButton
               title="Log In"
-              disabled={!isEmailValid}
-              onPress={() => {
-                Keyboard.dismiss();
-                setModalVisible(true);
-              }}
+              disabled={!isEmailValid || isBusy || !!socialLoading}
+              onPress={handleSendCode}
             />
           </View>
 
           <AuthDivider />
 
-          <SocialAuthButton provider="google" />
-          <SocialAuthButton provider="facebook" />
+          <SocialAuthButton
+            provider="google"
+            onPress={handleGooglePress}
+            disabled={isBusy || socialLoading === "facebook"}
+          />
+          <SocialAuthButton
+            provider="facebook"
+            onPress={handleFacebookPress}
+            disabled={isBusy || socialLoading === "google"}
+          />
           <SocialAuthButton provider="apple" />
 
           <View className="mt-6 flex-row items-center justify-center pb-4">
@@ -88,7 +174,14 @@ export default function SignInScreen() {
       <VerificationCodeModal
         visible={modalVisible}
         email={email.trim()}
-        onClose={() => setModalVisible(false)}
+        onClose={() => {
+          setModalVisible(false);
+          setModalError(null);
+        }}
+        onVerify={handleVerifyCode}
+        onResend={handleResendCode}
+        loading={verifying}
+        error={modalError}
       />
     </>
   );

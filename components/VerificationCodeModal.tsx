@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   InteractionManager,
   KeyboardAvoidingView,
   Modal,
@@ -18,6 +18,10 @@ type VerificationCodeModalProps = {
   visible: boolean;
   email: string;
   onClose: () => void;
+  onVerify: (code: string) => Promise<boolean>;
+  onResend?: () => Promise<void>;
+  loading?: boolean;
+  error?: string | null;
 };
 
 const CODE_LENGTH = 6;
@@ -26,8 +30,11 @@ export function VerificationCodeModal({
   visible,
   email,
   onClose,
+  onVerify,
+  onResend,
+  loading = false,
+  error = null,
 }: VerificationCodeModalProps) {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
   const [code, setCode] = useState("");
@@ -50,18 +57,27 @@ export function VerificationCodeModal({
     return () => clearTimeout(timer);
   }, [visible, focusCodeInput]);
 
-  useEffect(() => {
-    if (code.length !== CODE_LENGTH) {
-      return;
-    }
-
-    onClose();
-    router.replace("/");
-  }, [code, onClose, router]);
-
   const handleClose = () => {
     setCode("");
     onClose();
+  };
+
+  const handleCodeChange = async (text: string) => {
+    const nextCode = text.replace(/\D/g, "").slice(0, CODE_LENGTH);
+    setCode(nextCode);
+
+    if (nextCode.length !== CODE_LENGTH || loading) {
+      return;
+    }
+
+    const success = await onVerify(nextCode);
+    if (success) {
+      setCode("");
+      onClose();
+    } else {
+      setCode("");
+      focusCodeInput();
+    }
   };
 
   const digits = Array.from({ length: CODE_LENGTH }, (_, index) =>
@@ -91,7 +107,7 @@ export function VerificationCodeModal({
         >
           <View className="mb-4 flex-row items-center justify-between">
             <Text className="h3">Verify your email</Text>
-            <Pressable onPress={handleClose} hitSlop={12}>
+            <Pressable onPress={handleClose} hitSlop={12} disabled={loading}>
               <Ionicons name="close" size={24} color="#6B7280" />
             </Pressable>
           </View>
@@ -104,9 +120,14 @@ export function VerificationCodeModal({
             . Enter it below to continue.
           </Text>
 
+          {error ? (
+            <Text className="body-sm mb-4 text-[#E84B3B]">{error}</Text>
+          ) : null}
+
           <Pressable
             onPress={focusCodeInput}
             style={styles.codeInputWrapper}
+            disabled={loading}
           >
             <View className="flex-row justify-between gap-2" pointerEvents="none">
               {digits.map((digit, index) => (
@@ -128,17 +149,32 @@ export function VerificationCodeModal({
             <TextInput
               ref={inputRef}
               value={code}
-              onChangeText={(text) =>
-                setCode(text.replace(/\D/g, "").slice(0, CODE_LENGTH))
-              }
+              onChangeText={handleCodeChange}
               keyboardType="number-pad"
               inputMode="numeric"
               maxLength={CODE_LENGTH}
               caretHidden
               showSoftInputOnFocus
+              editable={!loading}
               style={styles.codeInput}
             />
           </Pressable>
+
+          {loading ? (
+            <ActivityIndicator color="#7B61FF" style={styles.loader} />
+          ) : null}
+
+          {onResend ? (
+            <Pressable
+              onPress={onResend}
+              disabled={loading}
+              className="mt-2 items-center py-2"
+            >
+              <Text className="font-poppins-semibold text-sm text-lingua-purple">
+                Resend code
+              </Text>
+            </Pressable>
+          ) : null}
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -188,5 +224,8 @@ const styles = StyleSheet.create({
   digitBoxActive: {
     borderColor: "#7B61FF",
     borderWidth: 2,
+  },
+  loader: {
+    marginBottom: 8,
   },
 });
