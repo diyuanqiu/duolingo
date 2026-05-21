@@ -6,7 +6,7 @@ export default function Index() {
     <>
       <Stack.Screen options={{ title: "index", headerTitleAlign: "center" }} />
       <View className="flex-1 items-center justify-center">
-        <Text className="text-xl font-bold text-blue-500">Duolingo</Text>
+        <Text className="h1 color-lingua-purple">Duolingo</Text>
       </View>
     </>
   );
