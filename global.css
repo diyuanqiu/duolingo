@@ -1,0 +1,12 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+
+@import "nativewind/theme";
+
+/* Layer: design tokens */
+@import "./theme/tokens.css" layer(theme);
+
+/* Layer: custom utilities */
+@import "./theme/typography.utilities.css";
+@import "./theme/layout.utilities.css";

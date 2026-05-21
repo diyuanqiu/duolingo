@@ -1,0 +1,54 @@
+/**
+ * Lingua layout & surface utilities (BEM-style blocks: page, card, swatch).
+ */
+
+@utility page {
+  flex: 1;
+  background-color: var(--color-surface);
+}
+
+@utility page__inner {
+  flex: 1;
+  padding: 20px;
+  gap: 16px;
+}
+
+@utility card {
+  background-color: var(--color-background);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  border-width: 1px;
+  border-color: var(--color-border);
+}
+
+@utility card__header {
+  margin-bottom: 16px;
+}
+
+@utility swatch {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-swatch);
+}
+
+@utility swatch__label {
+  margin-top: 8px;
+  gap: 2px;
+}
+
+@utility color-grid {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+@utility color-grid__item {
+  width: 72px;
+  align-items: flex-start;
+}
+
+@utility divider {
+  height: 1px;
+  background-color: var(--color-border);
+  width: 100%;
+}

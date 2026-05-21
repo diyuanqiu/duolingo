@@ -1,0 +1,90 @@
+/**
+ * Lingua typography utilities (BEM-style block: typography).
+ * Combines Poppins weight + size + line-height per design system.
+ */
+
+@utility typography-h1 {
+  font-family: var(--font-poppins-bold);
+  font-size: var(--text-h1);
+  line-height: var(--text-h1--line-height);
+  color: var(--color-text-primary);
+}
+
+@utility typography-h2 {
+  font-family: var(--font-poppins-semibold);
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  color: var(--color-text-primary);
+}
+
+@utility typography-h3 {
+  font-family: var(--font-poppins-semibold);
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  color: var(--color-text-primary);
+}
+
+@utility typography-h4 {
+  font-family: var(--font-poppins-medium);
+  font-size: var(--text-h4);
+  line-height: var(--text-h4--line-height);
+  color: var(--color-text-primary);
+}
+
+@utility typography-body-lg {
+  font-family: var(--font-poppins-regular);
+  font-size: var(--text-body-lg);
+  line-height: var(--text-body-lg--line-height);
+  color: var(--color-text-primary);
+}
+
+@utility typography-body-md {
+  font-family: var(--font-poppins-regular);
+  font-size: var(--text-body-md);
+  line-height: var(--text-body-md--line-height);
+  color: var(--color-text-primary);
+}
+
+@utility typography-body-sm {
+  font-family: var(--font-poppins-regular);
+  font-size: var(--text-body-sm);
+  line-height: var(--text-body-sm--line-height);
+  color: var(--color-text-secondary);
+}
+
+@utility typography-caption {
+  font-family: var(--font-poppins-regular);
+  font-size: var(--text-caption);
+  line-height: var(--text-caption--line-height);
+  color: var(--color-text-secondary);
+}
+
+@utility typography-wordmark {
+  font-family: var(--font-poppins-bold);
+  font-size: 28px;
+  line-height: 33.6px;
+  color: var(--color-text-primary);
+}
+
+@utility typography-section-label {
+  font-family: var(--font-poppins-bold);
+  font-size: 12px;
+  line-height: 14.4px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-lingua-purple);
+}
+
+@utility typography-color-name {
+  font-family: var(--font-poppins-semibold);
+  font-size: 11px;
+  line-height: 14.3px;
+  color: var(--color-text-primary);
+}
+
+@utility typography-color-hex {
+  font-family: var(--font-poppins-regular);
+  font-size: 11px;
+  line-height: 15.4px;
+  color: var(--color-text-secondary);
+}
