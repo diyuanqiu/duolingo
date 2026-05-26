@@ -2,10 +2,11 @@ import { AuthGradientButton } from "@/components/AuthGradientButton";
 import { images } from "@/constants/images";
 import { languages } from "@/data/languages";
 import { getFlagImageSource } from "@/lib/flags";
+import { useLanguageStore } from "@/store/language-store";
 import type { Language, LanguageCode } from "@/types/learning";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Image,
   Pressable,
@@ -61,11 +62,24 @@ function LanguageOptionRow({
 
 export default function ChooseLanguageScreen() {
   const router = useRouter();
+  const persistedLanguageId = useLanguageStore(
+    (state) => state.selectedLanguageId
+  );
+  const hasHydrated = useLanguageStore((state) => state._hasHydrated);
+  const setSelectedLanguage = useLanguageStore(
+    (state) => state.setSelectedLanguage
+  );
   const [selectedId, setSelectedId] = useState<LanguageCode | null>(
-    () => languages[0]?.id ?? null
+    () => persistedLanguageId ?? languages[0]?.id ?? null
   );
   const hasLanguages = languages.length > 0;
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (hasHydrated && persistedLanguageId) {
+      setSelectedId(persistedLanguageId);
+    }
+  }, [hasHydrated, persistedLanguageId]);
 
   const filteredLanguages = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -143,7 +157,13 @@ export default function ChooseLanguageScreen() {
               <AuthGradientButton
                 title="Confirm"
                 disabled={selectedId === null}
-                onPress={() => router.back()}
+                onPress={() => {
+                  if (selectedId === null) {
+                    return;
+                  }
+                  setSelectedLanguage(selectedId);
+                  router.replace("/");
+                }}
               />
             </View>
           </ScrollView>
