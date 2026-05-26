@@ -1,5 +1,6 @@
+import { extendedLessons, extendedUnits } from "@/data/extended-content";
 import { languages } from "@/data/languages";
-import { units } from "@/data/units";
+import { units as baseUnits } from "@/data/units";
 import type { Language, LanguageCode, Lesson, Unit } from "@/types/learning";
 
 export const lessons: Lesson[] = [
@@ -596,6 +597,10 @@ export const lessons: Lesson[] = [
   },
 ];
 
+export const units = [...baseUnits, ...extendedUnits];
+
+export const allLessons: Lesson[] = [...lessons, ...extendedLessons];
+
 export function getLanguageById(id: LanguageCode): Language | undefined {
   return languages.find((language) => language.id === id);
 }
@@ -607,11 +612,22 @@ export function getUnitsForLanguage(languageId: LanguageCode): Unit[] {
 }
 
 export function getLessonsForUnit(unitId: string): Lesson[] {
-  return lessons
+  return allLessons
     .filter((lesson) => lesson.unitId === unitId)
     .sort((a, b) => a.order - b.order);
 }
 
 export function getLessonById(id: string): Lesson | undefined {
-  return lessons.find((lesson) => lesson.id === id);
+  return allLessons.find((lesson) => lesson.id === id);
+}
+
+export function getUnitById(id: string): Unit | undefined {
+  return units.find((unit) => unit.id === id);
+}
+
+export function getUnitForLanguageOrder(
+  languageId: LanguageCode,
+  order: number
+): Unit | undefined {
+  return getUnitsForLanguage(languageId).find((unit) => unit.order === order);
 }

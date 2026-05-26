@@ -50,6 +50,11 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="unit/[unitId]" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="lesson/[lessonId]"
+            options={{ headerShown: true, title: "Lesson" }}
+          />
         </Stack>
       </AuthGate>
     </ClerkProvider>

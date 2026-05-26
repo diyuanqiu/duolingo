@@ -7,6 +7,7 @@ import type { LanguageCode } from "@/types/learning";
 import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import {
   Image,
   Pressable,
@@ -21,6 +22,7 @@ const HORIZONTAL_PADDING = 20;
 const SECTION_GAP = 16;
 
 export default function HomeScreen() {
+  const router = useRouter();
   const { user } = useUser();
   const selectedLanguageId = useLanguageStore(
     (state) => state.selectedLanguageId
@@ -48,6 +50,7 @@ export default function HomeScreen() {
   const greeting = getGreeting(languageId, firstName);
   const { language, progress, unitLabel, todayPlan, dailyProgressPercent } =
     home;
+  const currentUnitId = `${languageId}-unit-${progress.currentUnitOrder}`;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -148,6 +151,12 @@ export default function HomeScreen() {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Continue"
+                onPress={() =>
+                  router.push({
+                    pathname: "/unit/[unitId]",
+                    params: { unitId: currentUnitId },
+                  })
+                }
                 className="mt-4 self-start rounded-full bg-white px-6 py-2.5"
               >
                 <Text className="font-poppins-semibold text-sm text-lingua-purple">
