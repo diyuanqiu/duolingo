@@ -1,11 +1,12 @@
 import { useAuth, useClerk, useUser } from "@clerk/expo";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
 export default function Index() {
   const { isLoaded } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
+  const router = useRouter();
 
   if (!isLoaded) {
     return null;
@@ -23,9 +24,17 @@ export default function Index() {
         ) : null}
         <Pressable
           className="mt-8 rounded-2xl bg-lingua-purple px-6 py-3"
-          onPress={() => signOut()}
+          onPress={() => router.push("/choose-language")}
         >
           <Text className="font-poppins-semibold text-base text-white">
+            Choose a language
+          </Text>
+        </Pressable>
+        <Pressable
+          className="mt-4 rounded-2xl border border-border bg-white px-6 py-3"
+          onPress={() => signOut()}
+        >
+          <Text className="font-poppins-semibold text-base text-text-primary">
             Sign out
           </Text>
         </Pressable>
