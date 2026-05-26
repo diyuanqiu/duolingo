@@ -48,6 +48,25 @@ const DEFAULT_PROGRESS: Record<LanguageCode, LanguageProgress> = {
   },
 };
 
+const LANGUAGE_CODES: LanguageCode[] = ["es", "fr", "zh"];
+
+function normalizeProgressByLanguage(
+  stored: Partial<Record<LanguageCode, LanguageProgress>> | undefined
+): Record<LanguageCode, LanguageProgress> {
+  return LANGUAGE_CODES.reduce(
+    (acc, languageId) => {
+      const entry = stored?.[languageId];
+      acc[languageId] = {
+        ...DEFAULT_PROGRESS[languageId],
+        ...(entry ?? {}),
+        completedLessonIds: entry?.completedLessonIds ?? [],
+      };
+      return acc;
+    },
+    {} as Record<LanguageCode, LanguageProgress>
+  );
+}
+
 type ProgressState = {
   progressByLanguage: Record<LanguageCode, LanguageProgress>;
   getProgressForLanguage: (languageId: LanguageCode) => LanguageProgress;
@@ -56,6 +75,8 @@ type ProgressState = {
     progress: Partial<LanguageProgress>
   ) => void;
 };
+
+type PersistedProgressState = Pick<ProgressState, "progressByLanguage">;
 
 export const useProgressStore = create<ProgressState>()(
   persist(
@@ -77,6 +98,26 @@ export const useProgressStore = create<ProgressState>()(
     {
       name: "progress-storage",
       storage: createJSONStorage(() => AsyncStorage),
+      version: 1,
+      migrate: (persistedState): PersistedProgressState => {
+        const state = (persistedState ?? {}) as Partial<PersistedProgressState>;
+        return {
+          progressByLanguage: normalizeProgressByLanguage(
+            state.progressByLanguage
+          ),
+        };
+      },
+      onRehydrateStorage: () => (state) => {
+        if (!state?.progressByLanguage) {
+          return;
+        }
+
+        useProgressStore.setState({
+          progressByLanguage: normalizeProgressByLanguage(
+            state.progressByLanguage
+          ),
+        });
+      },
     }
   )
 );

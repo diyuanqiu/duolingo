@@ -13,12 +13,15 @@ type LessonRowProps = {
 export function LessonRow({ lesson, status, onPress }: LessonRowProps) {
   const isActive = status === "in_progress";
   const isCompleted = status === "completed";
+  const isUpcoming = status === "upcoming";
 
   return (
     <Pressable
-      accessibilityRole="button"
+      accessibilityRole={isUpcoming ? "text" : "button"}
+      accessibilityState={{ disabled: isUpcoming }}
       accessibilityLabel={`${lesson.title}, lesson ${lesson.order}`}
-      onPress={onPress}
+      disabled={isUpcoming}
+      onPress={isUpcoming ? undefined : onPress}
       className={`mb-3 flex-row items-center rounded-2xl border px-4 py-4 ${
         isActive
           ? "border-lingua-purple bg-[#F3EEFF]"
