@@ -185,6 +185,7 @@ export default function HomeScreen() {
               </Text>
               <Pressable
                 accessibilityRole="button"
+                accessibilityLabel="Continue"
                 className="mt-4 self-start rounded-full bg-white px-6 py-2.5"
               >
                 <Text className="font-poppins-semibold text-sm text-lingua-purple">
@@ -206,7 +207,11 @@ export default function HomeScreen() {
             <Text className="font-poppins-bold text-lg text-text-primary">
               Today&apos;s plan
             </Text>
-            <Pressable accessibilityRole="button" hitSlop={8}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="View all"
+              hitSlop={8}
+            >
               <Text className="font-poppins-semibold text-sm text-lingua-purple">
                 View all
               </Text>

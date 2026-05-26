@@ -43,10 +43,16 @@ export function getHomeSummary(languageId: LanguageCode): HomeSummary | null {
   const currentLesson = getLessonById(progress.currentLessonId);
   const unitLabel = `${progress.level} • Unit ${progress.currentUnitOrder}`;
 
-  const dailyProgressPercent = Math.min(
-    100,
-    Math.round((progress.dailyXpEarned / progress.dailyGoalXp) * 100)
-  );
+  const dailyProgressPercent =
+    progress.dailyGoalXp === 0
+      ? 0
+      : Math.max(
+          0,
+          Math.min(
+            100,
+            Math.round((progress.dailyXpEarned / progress.dailyGoalXp) * 100)
+          )
+        );
 
   return {
     language,
