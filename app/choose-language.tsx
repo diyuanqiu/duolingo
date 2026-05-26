@@ -61,7 +61,10 @@ function LanguageOptionRow({
 
 export default function ChooseLanguageScreen() {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState<LanguageCode>(languages[0].id);
+  const [selectedId, setSelectedId] = useState<LanguageCode | null>(
+    () => languages[0]?.id ?? null
+  );
+  const hasLanguages = languages.length > 0;
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredLanguages = useMemo(() => {
@@ -130,13 +133,16 @@ export default function ChooseLanguageScreen() {
 
             {filteredLanguages.length === 0 ? (
               <Text className="body-sm mt-4 text-center">
-                No languages match your search.
+                {hasLanguages
+                  ? "No languages match your search."
+                  : "No languages available."}
               </Text>
             ) : null}
 
             <View className="mt-6">
               <AuthGradientButton
                 title="Confirm"
+                disabled={selectedId === null}
                 onPress={() => router.back()}
               />
             </View>
