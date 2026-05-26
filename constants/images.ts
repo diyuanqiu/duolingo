@@ -30,8 +30,12 @@ export type LessonImageKey =
 
 /** Remote placeholders when no local asset exists. */
 export const remoteImages = {
+  audioLessonBackground:
+    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&h=1200&fit=crop",
   aiTeacherAvatar:
     "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face",
+  userLessonAvatar:
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face",
   unitHero: {
     cafe: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&h=420&fit=crop",
     everyday:
@@ -66,6 +70,20 @@ export const images = {
   streakFire,
   treasure,
 };
+
+export function getAudioLessonBackgroundSource(): ImageSourcePropType {
+  return { uri: remoteImages.audioLessonBackground };
+}
+
+export function getUserLessonAvatarSource(
+  imageUrl?: string | null
+): ImageSourcePropType {
+  if (imageUrl) {
+    return { uri: imageUrl };
+  }
+
+  return { uri: remoteImages.userLessonAvatar };
+}
 
 export function getUnitHeroImageSource(
   heroImageKey?: string

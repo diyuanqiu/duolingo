@@ -53,7 +53,7 @@ export default function RootLayout() {
           <Stack.Screen name="unit/[unitId]" options={{ headerShown: false }} />
           <Stack.Screen
             name="lesson/[lessonId]"
-            options={{ headerShown: true, title: "Lesson" }}
+            options={{ headerShown: false }}
           />
         </Stack>
       </AuthGate>
