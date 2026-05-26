@@ -52,7 +52,7 @@ export default function SSOCallbackScreen() {
         );
 
         if (success) {
-          router.replace("/");
+          router.replace("/index");
           return;
         }
 

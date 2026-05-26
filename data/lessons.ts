@@ -200,6 +200,79 @@ export const lessons: Lesson[] = [
         "Focus: me llamo, soy de, y tú, encantado/encantada. Phrases: Me llamo…, Soy de los Estados Unidos, ¿De dónde eres? Do not teach unrelated topics or other languages.",
     },
   },
+  // Spanish — At the café
+  {
+    id: "es-lesson-cafe",
+    unitId: "es-unit-3",
+    languageId: "es",
+    order: 1,
+    title: "At the café",
+    description: "Order drinks and snacks at a café.",
+    lessonType: "chat",
+    xpReward: 20,
+    goals: [
+      {
+        id: "es-lesson-cafe-goal-1",
+        description: "Order a drink politely.",
+      },
+      {
+        id: "es-lesson-cafe-goal-2",
+        description: "Ask for the check.",
+      },
+    ],
+    vocabulary: [
+      {
+        id: "es-lesson-cafe-vocab-1",
+        term: "café",
+        translation: "coffee / café",
+        pronunciation: "kah-FEH",
+        example: "Un café, por favor.",
+      },
+      {
+        id: "es-lesson-cafe-vocab-2",
+        term: "la cuenta",
+        translation: "the bill",
+        pronunciation: "lah KWEHN-tah",
+        example: "La cuenta, por favor.",
+      },
+    ],
+    phrases: [
+      {
+        id: "es-lesson-cafe-phrase-1",
+        text: "Quisiera un café con leche.",
+        translation: "I would like a coffee with milk.",
+      },
+      {
+        id: "es-lesson-cafe-phrase-2",
+        text: "¿Cuánto cuesta?",
+        translation: "How much does it cost?",
+      },
+    ],
+    activities: [
+      {
+        id: "es-lesson-cafe-activity-1",
+        type: "vocabulary",
+        title: "Café essentials",
+        instruction: "Practice café and la cuenta.",
+        vocabularyIds: ["es-lesson-cafe-vocab-1", "es-lesson-cafe-vocab-2"],
+      },
+      {
+        id: "es-lesson-cafe-activity-2",
+        type: "speaking",
+        title: "Order at the counter",
+        instruction: "Order a drink and ask for the bill.",
+        phraseIds: ["es-lesson-cafe-phrase-1", "es-lesson-cafe-phrase-2"],
+      },
+    ],
+    aiTeacher: {
+      system:
+        "You are a warm Spanish teacher helping the student order at a café. Stay within café vocabulary and phrases.",
+      kickoff:
+        "Welcome to our café lesson! Let's start with un café, por favor. Can you try ordering a coffee?",
+      lessonContext:
+        "Focus: café, la cuenta. Phrases: Quisiera un café con leche, ¿Cuánto cuesta?",
+    },
+  },
   // French — Greetings
   {
     id: "fr-lesson-1",

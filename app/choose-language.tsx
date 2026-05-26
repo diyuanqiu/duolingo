@@ -162,7 +162,7 @@ export default function ChooseLanguageScreen() {
                     return;
                   }
                   setSelectedLanguage(selectedId);
-                  router.replace("/");
+                  router.replace("/index");
                 }}
               />
             </View>
