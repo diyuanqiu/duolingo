@@ -31,16 +31,16 @@ export function AuthGate({ children }: AuthGateProps) {
     const firstSegment = segments[0] as string | undefined;
     const isPublicRoute =
       firstSegment !== undefined && PUBLIC_SEGMENTS.has(firstSegment);
-    const isHome = firstSegment === undefined;
+    const isTabsRoute = firstSegment === "(tabs)";
     const isChooseLanguage = firstSegment === "choose-language";
     const hasSelectedLanguage = selectedLanguageId !== null;
 
     if (isSignedIn && isPublicRoute && firstSegment !== "sso-callback") {
-      router.replace(hasSelectedLanguage ? "/" : "/choose-language");
+      router.replace(hasSelectedLanguage ? "/index" : "/choose-language");
       return;
     }
 
-    if (isSignedIn && !hasSelectedLanguage && isHome) {
+    if (isSignedIn && !hasSelectedLanguage && isTabsRoute) {
       router.replace("/choose-language");
       return;
     }
@@ -50,7 +50,7 @@ export function AuthGate({ children }: AuthGateProps) {
       return;
     }
 
-    if (!isSignedIn && isHome) {
+    if (!isSignedIn && isTabsRoute) {
       router.replace("/onboarding");
     }
   }, [

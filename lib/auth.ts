@@ -88,7 +88,7 @@ export async function finalizeSignIn(signIn: Finalizable, router: Router) {
 
   await signIn.finalize({
     navigate: () => {
-      router.replace("/");
+      router.replace("/index");
     },
   });
 
@@ -102,7 +102,7 @@ export async function finalizeSignUp(signUp: Finalizable, router: Router) {
 
   await signUp.finalize({
     navigate: () => {
-      router.replace("/");
+      router.replace("/index");
     },
   });
 

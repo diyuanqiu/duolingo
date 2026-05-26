@@ -1,4 +1,5 @@
 import "../global.css";
+import "react-native-reanimated";
 
 import { AuthGate } from "@/components/AuthGate";
 import { useAppFonts } from "@/lib/fonts";
@@ -44,7 +45,9 @@ export default function RootLayout() {
             headerTitleStyle: { fontFamily: "Poppins-SemiBold" },
             contentStyle: { backgroundColor: "#F6F7FB" },
           }}
-        />
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
       </AuthGate>
     </ClerkProvider>
   );
