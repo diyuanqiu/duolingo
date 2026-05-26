@@ -27,6 +27,7 @@ export type Unit = {
   order: number;
   title: string;
   description: string;
+  heroImageKey?: string;
 };
 
 export type VocabularyItem = {

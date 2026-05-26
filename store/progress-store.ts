@@ -7,6 +7,7 @@ export type LanguageProgress = {
   level: string;
   currentUnitOrder: number;
   currentLessonId: string;
+  completedLessonIds: string[];
   dailyGoalXp: number;
   dailyXpEarned: number;
   streakDays: number;
@@ -16,7 +17,13 @@ const DEFAULT_PROGRESS: Record<LanguageCode, LanguageProgress> = {
   es: {
     level: "A1",
     currentUnitOrder: 3,
-    currentLessonId: "es-lesson-2",
+    currentLessonId: "es-unit3-l3",
+    completedLessonIds: [
+      "es-lesson-1",
+      "es-lesson-2",
+      "es-unit3-l1",
+      "es-unit3-l2",
+    ],
     dailyGoalXp: 20,
     dailyXpEarned: 15,
     streakDays: 12,
@@ -25,6 +32,7 @@ const DEFAULT_PROGRESS: Record<LanguageCode, LanguageProgress> = {
     level: "A1",
     currentUnitOrder: 1,
     currentLessonId: "fr-lesson-1",
+    completedLessonIds: [],
     dailyGoalXp: 20,
     dailyXpEarned: 10,
     streakDays: 5,
@@ -33,6 +41,7 @@ const DEFAULT_PROGRESS: Record<LanguageCode, LanguageProgress> = {
     level: "A1",
     currentUnitOrder: 1,
     currentLessonId: "zh-lesson-1",
+    completedLessonIds: [],
     dailyGoalXp: 20,
     dailyXpEarned: 8,
     streakDays: 3,
