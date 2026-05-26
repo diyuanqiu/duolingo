@@ -1,5 +1,5 @@
-import "../global.css";
 import "react-native-reanimated";
+import "../global.css";
 
 import { AuthGate } from "@/components/AuthGate";
 import { useAppFonts } from "@/lib/fonts";
