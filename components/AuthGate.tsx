@@ -1,3 +1,4 @@
+import { useLanguageStore } from "@/store/language-store";
 import { useAuth } from "@clerk/expo";
 import { useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
@@ -17,9 +18,13 @@ export function AuthGate({ children }: AuthGateProps) {
   const { isLoaded, isSignedIn } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const selectedLanguageId = useLanguageStore(
+    (state) => state.selectedLanguageId
+  );
+  const hasHydrated = useLanguageStore((state) => state._hasHydrated);
 
   useEffect(() => {
-    if (!isLoaded) {
+    if (!isLoaded || !hasHydrated) {
       return;
     }
 
@@ -27,16 +32,35 @@ export function AuthGate({ children }: AuthGateProps) {
     const isPublicRoute =
       firstSegment !== undefined && PUBLIC_SEGMENTS.has(firstSegment);
     const isHome = firstSegment === undefined;
+    const isChooseLanguage = firstSegment === "choose-language";
+    const hasSelectedLanguage = selectedLanguageId !== null;
 
     if (isSignedIn && isPublicRoute && firstSegment !== "sso-callback") {
-      router.replace("/");
+      router.replace(hasSelectedLanguage ? "/" : "/choose-language");
+      return;
+    }
+
+    if (isSignedIn && !hasSelectedLanguage && isHome) {
+      router.replace("/choose-language");
+      return;
+    }
+
+    if (isSignedIn && !hasSelectedLanguage && !isChooseLanguage) {
+      router.replace("/choose-language");
       return;
     }
 
     if (!isSignedIn && isHome) {
       router.replace("/onboarding");
     }
-  }, [isLoaded, isSignedIn, segments, router]);
+  }, [
+    isLoaded,
+    isSignedIn,
+    hasHydrated,
+    selectedLanguageId,
+    segments,
+    router,
+  ]);
 
   return children;
 }
