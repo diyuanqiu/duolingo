@@ -36,7 +36,7 @@ export function AuthGate({ children }: AuthGateProps) {
     const hasSelectedLanguage = selectedLanguageId !== null;
 
     if (isSignedIn && isPublicRoute && firstSegment !== "sso-callback") {
-      router.replace(hasSelectedLanguage ? "/index" : "/choose-language");
+      router.replace(hasSelectedLanguage ? "/" : "/choose-language");
       return;
     }
 

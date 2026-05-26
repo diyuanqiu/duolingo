@@ -10,7 +10,15 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Copy environment variables
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Fill in your Clerk and PostHog keys in `.env`. Do not commit `.env` to version control.
+
+3. Start the app
 
    ```bash
    npx expo start

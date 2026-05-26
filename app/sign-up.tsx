@@ -10,8 +10,7 @@ import {
   finalizeSignIn,
   finalizeSignUp,
   getClerkErrorMessage,
-  getHookGlobalError,
-  needsEmailVerification,
+  initiateSignUp,
 } from "@/lib/auth";
 import { useSignIn, useSignUp } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
@@ -66,89 +65,34 @@ export default function SignUpScreen() {
     setSubmitting(true);
 
     try {
-      const { error } = await signUp.password({
-        emailAddress: email.trim(),
+      const result = await initiateSignUp({
+        email,
         password,
+        signUp,
+        signIn,
+        signUpErrors,
+        signInErrors,
       });
 
-      if (error) {
-        setFormError(
-          getClerkErrorMessage(error, signUpErrors?.fields, "emailAddress")
-        );
+      if (!result.success) {
+        setFormError(result.error ?? "Sign-up failed. Please try again.");
         return;
       }
 
-      const hookError = getHookGlobalError(signUpErrors);
-      if (hookError) {
-        setFormError(hookError);
-        return;
-      }
-
-      if (signUp.status === "complete") {
+      if (result.completeSignUp) {
         await finalizeSignUp(signUp, router);
         return;
       }
 
-      if (signUp.isTransferable) {
-        const { error: signInError } = await signIn.password({
-          emailAddress: email.trim(),
-          password,
-        });
-
-        if (signInError) {
-          setFormError(
-            "This email is already registered. Please log in with your password."
-          );
-          return;
-        }
-
-        if (signIn.status === "complete") {
-          await finalizeSignIn(signIn, router);
-          return;
-        }
-
-        if (signIn.status === "needs_client_trust") {
-          const { error: mfaSendError } = await signIn.mfa.sendEmailCode();
-          if (mfaSendError) {
-            setFormError(
-              getClerkErrorMessage(mfaSendError, signInErrors?.fields, "code")
-            );
-            return;
-          }
-          setUseSignInVerification(true);
-          setModalVisible(true);
-          return;
-        }
-
-        setFormError("Please log in from the Log in screen.");
+      if (result.completeSignIn) {
+        await finalizeSignIn(signIn, router);
         return;
       }
 
-      const missingFields = signUp.missingFields ?? [];
-      if (missingFields.length > 0) {
-        setFormError(
-          `Additional information required: ${missingFields.join(", ")}`
-        );
-        return;
+      if (result.needsVerification) {
+        setUseSignInVerification(result.useSignInVerification ?? false);
+        setModalVisible(true);
       }
-
-      if (!needsEmailVerification(signUp)) {
-        setFormError(
-          `Sign-up could not continue (status: ${signUp.status}). Check Clerk email verification settings.`
-        );
-        return;
-      }
-
-      const { error: sendError } = await signUp.verifications.sendEmailCode();
-
-      if (sendError) {
-        setFormError(
-          getClerkErrorMessage(sendError, signUpErrors?.fields, "code")
-        );
-        return;
-      }
-
-      setModalVisible(true);
     } catch (err: unknown) {
       const message =
         err && typeof err === "object" && "message" in err
@@ -297,8 +241,6 @@ export default function SignUpScreen() {
             onPress={handleFacebookPress}
             disabled={isBusy || socialLoading === "google"}
           />
-          <SocialAuthButton provider="apple" />
-
           <View className="mt-6 flex-row items-center justify-center pb-4">
             <Text className="body-sm">Already have an account? </Text>
             <Pressable onPress={() => router.push("/sign-in")}>

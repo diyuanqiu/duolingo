@@ -43,7 +43,7 @@ export function useSocialAuth() {
 
         const activated = await activateSession(createdSessionId, setActive);
         if (activated) {
-          router.replace("/index");
+          router.replace("/");
         }
       } catch (err: unknown) {
         const message =

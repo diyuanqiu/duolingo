@@ -81,6 +81,141 @@ type Finalizable = {
   }) => Promise<unknown>;
 };
 
+type SignUpResource = SignUpLike & {
+  isTransferable?: boolean;
+  password: (params: {
+    emailAddress: string;
+    password: string;
+  }) => Promise<{ error: ClerkErrorLike }>;
+  verifications: {
+    sendEmailCode: () => Promise<{ error: ClerkErrorLike }>;
+  };
+};
+
+type SignInResource = {
+  status: string;
+  password: (params: {
+    emailAddress: string;
+    password: string;
+  }) => Promise<{ error: ClerkErrorLike }>;
+  mfa: {
+    sendEmailCode: () => Promise<{ error: ClerkErrorLike }>;
+  };
+};
+
+export type InitiateSignUpResult = {
+  success: boolean;
+  completeSignUp?: boolean;
+  completeSignIn?: boolean;
+  needsVerification?: boolean;
+  useSignInVerification?: boolean;
+  error?: string;
+};
+
+type InitiateSignUpParams = {
+  email: string;
+  password: string;
+  signUp: SignUpResource;
+  signIn: SignInResource;
+  signUpErrors?: HookErrors;
+  signInErrors?: HookErrors;
+};
+
+export async function initiateSignUp({
+  email,
+  password,
+  signUp,
+  signIn,
+  signUpErrors,
+  signInErrors,
+}: InitiateSignUpParams): Promise<InitiateSignUpResult> {
+  const { error } = await signUp.password({
+    emailAddress: email.trim(),
+    password,
+  });
+
+  if (error) {
+    return {
+      success: false,
+      error: getClerkErrorMessage(error, signUpErrors?.fields, "emailAddress"),
+    };
+  }
+
+  const hookError = getHookGlobalError(signUpErrors);
+  if (hookError) {
+    return { success: false, error: hookError };
+  }
+
+  if (signUp.status === "complete") {
+    return { success: true, completeSignUp: true };
+  }
+
+  if (signUp.isTransferable) {
+    const { error: signInError } = await signIn.password({
+      emailAddress: email.trim(),
+      password,
+    });
+
+    if (signInError) {
+      return {
+        success: false,
+        error:
+          "This email is already registered. Please log in with your password.",
+      };
+    }
+
+    if (signIn.status === "complete") {
+      return { success: true, completeSignIn: true };
+    }
+
+    if (signIn.status === "needs_client_trust") {
+      const { error: mfaSendError } = await signIn.mfa.sendEmailCode();
+      if (mfaSendError) {
+        return {
+          success: false,
+          error: getClerkErrorMessage(mfaSendError, signInErrors?.fields, "code"),
+        };
+      }
+
+      return {
+        success: true,
+        needsVerification: true,
+        useSignInVerification: true,
+      };
+    }
+
+    return {
+      success: false,
+      error: "Please log in from the Log in screen.",
+    };
+  }
+
+  const missingFields = signUp.missingFields ?? [];
+  if (missingFields.length > 0) {
+    return {
+      success: false,
+      error: `Additional information required: ${missingFields.join(", ")}`,
+    };
+  }
+
+  if (!needsEmailVerification(signUp)) {
+    return {
+      success: false,
+      error: `Sign-up could not continue (status: ${signUp.status}). Check Clerk email verification settings.`,
+    };
+  }
+
+  const { error: sendError } = await signUp.verifications.sendEmailCode();
+  if (sendError) {
+    return {
+      success: false,
+      error: getClerkErrorMessage(sendError, signUpErrors?.fields, "code"),
+    };
+  }
+
+  return { success: true, needsVerification: true };
+}
+
 export async function finalizeSignIn(signIn: Finalizable, router: Router) {
   if (signIn.status !== "complete") {
     return false;
@@ -88,7 +223,7 @@ export async function finalizeSignIn(signIn: Finalizable, router: Router) {
 
   await signIn.finalize({
     navigate: () => {
-      router.replace("/index");
+      router.replace("/");
     },
   });
 
@@ -102,7 +237,7 @@ export async function finalizeSignUp(signUp: Finalizable, router: Router) {
 
   await signUp.finalize({
     navigate: () => {
-      router.replace("/index");
+      router.replace("/");
     },
   });
 

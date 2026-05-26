@@ -158,8 +158,6 @@ export default function SignInScreen() {
             onPress={handleFacebookPress}
             disabled={isBusy || socialLoading === "google"}
           />
-          <SocialAuthButton provider="apple" />
-
           <View className="mt-6 flex-row items-center justify-center pb-4">
             <Text className="body-sm">Don&apos;t have an account? </Text>
             <Pressable onPress={() => router.push("/sign-up")}>

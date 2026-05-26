@@ -5,6 +5,7 @@ node_modules/
 
 # Expo
 .expo/
+.expo-tmp-types/
 dist/
 web-build/
 expo-env.d.ts
@@ -41,3 +42,4 @@ app-example
 # generated native folders
 /ios
 /android
+.env

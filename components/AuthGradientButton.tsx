@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 type AuthGradientButtonProps = {
   title: string;
@@ -21,11 +22,16 @@ export function AuthGradientButton({
         pressed && !disabled && styles.pressed,
       ]}
     >
-      <View style={styles.gradient}>
+      <LinearGradient
+        colors={["#7B61FF", "#6366F1"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.gradient}
+      >
         <Text className="font-poppins-semibold text-base text-white">
           {title}
         </Text>
-      </View>
+      </LinearGradient>
     </Pressable>
   );
 }
@@ -39,8 +45,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
-    experimental_backgroundImage:
-      "linear-gradient(to right, #7B61FF 0%, #6366F1 100%)",
   },
   disabled: {
     opacity: 0.5,

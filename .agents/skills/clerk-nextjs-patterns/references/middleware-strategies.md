@@ -81,12 +81,12 @@ const isMachineApi = createRouteMatcher(['/api/machine(.*)']);
 const isPublicApi = createRouteMatcher(['/api/public(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isMachineApi(req)) await auth.protect({ token: 'm2m_token' });
+  if (isMachineApi(req)) await auth.protect({ token: 'machine_token' });
   if (isPublicApi(req)) await auth.protect({ token: 'any' });
 });
 ```
 
-Token types: `'session_token'` (default, browser sessions), `'oauth_token'`, `'api_key'`, `'m2m_token'`, `'any'` (accept any valid token).
+Token types: `'session_token'` (default, browser sessions), `'oauth_token'`, `'api_key'`, `'machine_token'`, `'any'` (accept any valid token).
 
 > **Core 2 ONLY (skip if current SDK):** Token-type protection requires Core 3. In Core 2, `auth().protect()` only accepts a callback (no `token` option) and only validates session tokens.
 

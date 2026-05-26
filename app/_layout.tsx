@@ -3,7 +3,9 @@ import "../global.css";
 
 import { AuthGate } from "@/components/AuthGate";
 import { useAppFonts } from "@/lib/fonts";
+import { posthog } from "@/lib/posthog";
 import { ClerkProvider } from "@clerk/expo";
+import { PostHogProvider } from "posthog-react-native";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -33,6 +35,7 @@ export default function RootLayout() {
   }
 
   return (
+    <PostHogProvider client={posthog}>
     <ClerkProvider
       publishableKey={publishableKey as string}
       tokenCache={tokenCache}
@@ -50,5 +53,6 @@ export default function RootLayout() {
         </Stack>
       </AuthGate>
     </ClerkProvider>
+    </PostHogProvider>
   );
 }
