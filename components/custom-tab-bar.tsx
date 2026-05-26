@@ -2,7 +2,7 @@ import { colors, fontFamily } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useEffect, useRef } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -170,7 +170,18 @@ export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
 
 const styles = StyleSheet.create({
   tabBarShadow: {
-    boxShadow: "0 -2px 12px rgba(13, 19, 43, 0.06)",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#0D132B",
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 4,
+      },
+      default: {},
+    }),
   },
   tabRow: {
     position: "relative",

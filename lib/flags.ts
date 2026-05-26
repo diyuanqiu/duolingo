@@ -5,5 +5,5 @@ import type { LanguageCode } from "@/types/learning";
 export function getFlagImageSource(
   languageId: LanguageCode
 ): ImageSourcePropType {
-  return flagImages[languageId];
+  return flagImages[languageId] ?? flagImages.es;
 }
