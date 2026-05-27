@@ -262,17 +262,33 @@ Bottom bar with call action buttons: mic, camera, screen share, participants, re
 <div class="call-controls">
 
   <div class="call-controls__group call-controls__group--media">
-    <button class="call-controls__btn call-controls__btn--mic" aria-pressed="true" aria-label="Toggle microphone">
-      <!-- aria-pressed="false" + modifier --off when muted -->
-      <span class="call-controls__icon call-controls__icon--mic"></span>
-      <!-- OPTIONAL: device selector dropdown arrow -->
-      <button class="call-controls__device-toggle call-controls__device-toggle--mic" aria-label="Select microphone"></button>
-    </button>
+    <div class="call-controls__control">
+      <button class="call-controls__btn call-controls__btn--mic" aria-pressed="true" aria-label="Toggle microphone">
+        <!-- aria-pressed="false" + modifier --off when muted -->
+        <span class="call-controls__icon call-controls__icon--mic"></span>
+      </button>
+      <!-- OPTIONAL: device selector — sibling button, not nested inside call-controls__btn -->
+      <button
+        class="call-controls__device-toggle call-controls__device-toggle--mic"
+        aria-label="Select microphone"
+        aria-controls="call-controls-mic-devices"
+        aria-expanded="false"
+      ></button>
+      <!-- <div id="call-controls-mic-devices" class="call-controls__device-menu" hidden>...</div> -->
+    </div>
 
-    <button class="call-controls__btn call-controls__btn--camera" aria-pressed="true" aria-label="Toggle camera">
-      <span class="call-controls__icon call-controls__icon--camera"></span>
-      <button class="call-controls__device-toggle call-controls__device-toggle--camera" aria-label="Select camera"></button>
-    </button>
+    <div class="call-controls__control">
+      <button class="call-controls__btn call-controls__btn--camera" aria-pressed="true" aria-label="Toggle camera">
+        <span class="call-controls__icon call-controls__icon--camera"></span>
+      </button>
+      <button
+        class="call-controls__device-toggle call-controls__device-toggle--camera"
+        aria-label="Select camera"
+        aria-controls="call-controls-camera-devices"
+        aria-expanded="false"
+      ></button>
+      <!-- <div id="call-controls-camera-devices" class="call-controls__device-menu" hidden>...</div> -->
+    </div>
 
     <button class="call-controls__btn call-controls__btn--screen-share" aria-pressed="false" aria-label="Share screen">
       <span class="call-controls__icon call-controls__icon--screen-share"></span>

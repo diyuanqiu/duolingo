@@ -1,13 +1,13 @@
 import {
-  isStreamNativeAvailable,
-  STREAM_DEV_BUILD_MESSAGE,
-} from "@/lib/stream-native";
-import {
   createStreamCall,
   fetchStreamToken,
   type StreamCallResponse,
   type StreamTokenResponse,
 } from "@/lib/stream";
+import {
+  isStreamNativeAvailable,
+  STREAM_DEV_BUILD_MESSAGE,
+} from "@/lib/stream-native";
 import type { Lesson } from "@/types/learning";
 
 type StreamUser = {
@@ -72,7 +72,13 @@ export async function connectStreamCall(
   const call = client.call(callInfo.callType, callInfo.callId);
   await call.join({ create: false });
   await call.camera.disable().catch(() => undefined);
-  await call.microphone.enable().catch(() => undefined);
+    try {
+      await call.microphone.enable();
+    } catch (error) {
+      await call.leave().catch(() => undefined);
+      await client.disconnectUser().catch(() => undefined);
+      throw new Error("Microphone is required to start the audio lesson call.");
+  }
 
   return {
     callId: callInfo.callId,
