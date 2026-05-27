@@ -4,6 +4,7 @@ import {
   images,
 } from "@/constants/images";
 import { getLanguageById } from "@/data/lessons";
+import { useStreamAudioCall } from "@/hooks/useStreamAudioCall";
 import {
   DEFAULT_FEEDBACK_SCORES,
   formatSubtitlesText,
@@ -16,7 +17,7 @@ import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Image,
   ImageBackground,
@@ -57,36 +58,49 @@ export function AudioLessonScreen({ lesson }: AudioLessonScreenProps) {
   const language = getLanguageById(lesson.languageId);
   const userAvatarUrl = user?.imageUrl;
 
-  const [sessionStatus, setSessionStatus] =
-    useState<SessionStatus>("connecting");
-  const [micMuted, setMicMuted] = useState(false);
+  const {
+    status: streamStatus,
+    micMuted,
+    errorMessage,
+    participantCount,
+    localUserName,
+    callId,
+    toggleMic,
+    endCall,
+    retry,
+  } = useStreamAudioCall({ lesson });
+
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
   const [cameraPreviewVisible, setCameraPreviewVisible] = useState(true);
   const [teacherMessage, setTeacherMessage] = useState(lesson.aiTeacher.kickoff);
   const [hasResponded, setHasResponded] = useState(false);
+
+  const sessionStatus: SessionStatus =
+    streamStatus === "joined"
+      ? "joined"
+      : streamStatus === "error"
+        ? "error"
+        : streamStatus === "ended"
+          ? "ended"
+          : "connecting";
 
   const subtitlesText = useMemo(
     () => formatSubtitlesText(lesson.title, lesson.goals, lesson.phrases),
     [lesson]
   );
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSessionStatus("online");
-    }, 900);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleControlPress = (key: ControlKey) => {
+  const handleControlPress = async (key: ControlKey) => {
     if (key === "end") {
-      setSessionStatus("ended");
+      await endCall();
       router.back();
       return;
     }
 
     if (key === "mic") {
-      setMicMuted((value) => !value);
+      if (sessionStatus !== "joined") {
+        return;
+      }
+      await toggleMic();
       if (!hasResponded) {
         setHasResponded(true);
         setTeacherMessage(getTeacherResponseMessage(lesson));
@@ -107,12 +121,24 @@ export function AudioLessonScreen({ lesson }: AudioLessonScreenProps) {
   const sessionLabel =
     sessionStatus === "connecting"
       ? "Connecting…"
-      : sessionStatus === "ended"
-        ? "Ended"
-        : "Online";
+      : sessionStatus === "joined"
+        ? micMuted
+          ? "Joined · Muted"
+          : "Joined"
+        : sessionStatus === "error"
+          ? "Connection failed"
+          : sessionStatus === "ended"
+            ? "Ended"
+            : "Online";
 
   const sessionDotColor =
-    sessionStatus === "online" ? "#21C16B" : "#9CA3AF";
+    sessionStatus === "joined"
+      ? micMuted
+        ? "#F59E0B"
+        : "#21C16B"
+      : sessionStatus === "error"
+        ? "#FF4D4F"
+        : "#9CA3AF";
 
   return (
     <SafeAreaView
@@ -181,7 +207,35 @@ export function AudioLessonScreen({ lesson }: AudioLessonScreenProps) {
             Goal: {lesson.goals[0].description}
           </Text>
         ) : null}
+        {sessionStatus === "joined" ? (
+          <Text className="mt-1 font-poppins-medium text-[11px] text-text-secondary">
+            {localUserName} · {participantCount}{" "}
+            {participantCount === 1 ? "participant" : "participants"}
+            {callId ? ` · ${callId.slice(0, 18)}…` : ""}
+          </Text>
+        ) : null}
       </View>
+
+      {sessionStatus === "error" && errorMessage ? (
+        <View className="mx-4 mb-2 rounded-2xl border border-[#FECACA] bg-[#FEF2F2] px-3 py-3">
+          <Text className="font-poppins-semibold text-sm text-[#B91C1C]">
+            Could not join lesson call
+          </Text>
+          <Text className="mt-1 font-poppins-regular text-xs leading-5 text-[#7F1D1D]">
+            {errorMessage}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Retry connection"
+            onPress={retry}
+            className="mt-2 self-start rounded-full bg-[#FF4D4F] px-4 py-2"
+          >
+            <Text className="font-poppins-semibold text-xs text-white">
+              Try again
+            </Text>
+          </Pressable>
+        </View>
+      ) : null}
 
       <View
         className="mx-4 mb-4 overflow-hidden rounded-3xl"
@@ -243,6 +297,9 @@ export function AudioLessonScreen({ lesson }: AudioLessonScreenProps) {
                   const isSubtitlesActive =
                     item.key === "subtitles" && subtitlesEnabled;
                   const isHighlighted = isMicActive || isSubtitlesActive;
+                  const isDisabled =
+                    (item.key === "mic" && sessionStatus !== "joined") ||
+                    (item.key === "end" && sessionStatus === "connecting");
 
                   return (
                     <Pressable
@@ -251,8 +308,10 @@ export function AudioLessonScreen({ lesson }: AudioLessonScreenProps) {
                       accessibilityLabel={item.label}
                       accessibilityState={{
                         selected: isHighlighted,
+                        disabled: isDisabled,
                       }}
-                      onPress={() => handleControlPress(item.key)}
+                      disabled={isDisabled}
+                      onPress={() => void handleControlPress(item.key)}
                       className="items-center"
                     >
                       <View
