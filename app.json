@@ -42,7 +42,23 @@
       ],
       "@clerk/expo",
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      "@stream-io/video-react-native-sdk",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 24
+          }
+        }
+      ],
+      [
+        "@config-plugins/react-native-webrtc",
+        {
+          "cameraPermission": "Lingua needs camera access for video lessons.",
+          "microphonePermission": "Lingua needs microphone access for audio lessons with your AI teacher."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

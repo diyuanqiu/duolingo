@@ -1,6 +1,11 @@
 import type { Lesson, PhraseItem } from "@/types/learning";
 
-export type SessionStatus = "connecting" | "online" | "ended";
+export type SessionStatus =
+  | "connecting"
+  | "joined"
+  | "online"
+  | "error"
+  | "ended";
 
 export type LessonFeedbackScores = {
   speaking: string;

@@ -11,6 +11,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import * as WebBrowser from "expo-web-browser";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 WebBrowser.maybeCompleteAuthSession();
 SplashScreen.preventAutoHideAsync();
@@ -35,6 +36,7 @@ export default function RootLayout() {
   }
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <PostHogProvider client={posthog}>
     <ClerkProvider
       publishableKey={publishableKey as string}
@@ -59,5 +61,6 @@ export default function RootLayout() {
       </AuthGate>
     </ClerkProvider>
     </PostHogProvider>
+    </GestureHandlerRootView>
   );
 }
